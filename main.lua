@@ -1,55 +1,31 @@
-local Bullet = require "bullet"
+require "lib.lovetoys.lovetoys"
+
+local CircleShape = require "physics.shapes.Circle"
 
 function love.load()
-   x = 50
-   y = 50
-   movspeed = 35
-   xspeed, yspeed = 0, 0
+  c1 = CircleShape({300, 300}, 50)
+  c2 = CircleShape({350, 320}, 50)
 
-   bullets = {}
-
-   love.mouse.setVisible(false)
-end
-
-function love.mousepressed(mx, my, button, isTouch)
-  table.insert(bullets, Bullet.new(x, y, mx, my))
+  colliding, resolve = c1:collidesWith(c2)
 end
 
 function love.update(dt)
-
-  if love.keyboard.isDown("d") then
-    xspeed = xspeed + dt*movspeed
-  end
-  if love.keyboard.isDown("a") then
-    xspeed = xspeed - dt*movspeed
- end
-
-  if love.keyboard.isDown("s") then
-    yspeed = yspeed + dt*movspeed
-  end
-  if love.keyboard.isDown("w") then
-    yspeed = yspeed - dt*movspeed
-  end
-
-  for i,v in ipairs(bullets) do
-    bullets[i]:update(dt)
-  end
-
-  xspeed = xspeed * 0.93
-  yspeed = yspeed * 0.93
-
-  x = x + xspeed
-  y = y + yspeed
 end
 
 function love.draw()
-  for i,b in ipairs(bullets) do
-    love.graphics.rectangle("fill", b.x, b.y, 4, 4)
+  love.graphics.setColor(0, 255, 0)
+  love.graphics.circle("fill", c1.center.x, c1.center.y, c1.radius)
+  love.graphics.setColor(255, 0, 0)
+  love.graphics.circle("fill", c2.center.x, c2.center.y, c2.radius)
+
+  if colliding then
+    love.graphics.setColor(0, 255, 0)
+    love.graphics.print("YES", 0, 0)
+
+    love.graphics.setColor(255, 255, 255)
+    love.graphics.line(c1.center.x, c1.center.y, (c1.center + resolve):unpack())
+  else
+    love.graphics.setColor(255, 0, 0)
+    love.graphics.print("NO", 0, 0)
   end
-
-  love.graphics.setColor(135, 200, 35)
-  love.graphics.rectangle("fill", x, y, 20, 20)
-
-  love.graphics.setColor(255, 255, 255)
-  love.graphics.rectangle("fill", love.mouse.getX(), love.mouse.getY(), 4, 4)
 end
